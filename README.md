@@ -1,4 +1,4 @@
-# Next Level Week #1 - Back-End - rocketseat.com.br 
+# Next Level Week #1 - Back-End - [rocketseat.com.br](https://rocketseat.com.br) 
 Este é o back-end da aplicação proposta pelo curso. Este é desenvolvido com NodeJS e TypeScript.
 
 ---
