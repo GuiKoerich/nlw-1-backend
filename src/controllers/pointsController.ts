@@ -1,6 +1,7 @@
 import { Request, Response, response } from 'express';
 import knex from '../database/connection';
 
+import { host } from '../constants';
 
 class PointsController {
   
@@ -17,7 +18,14 @@ class PointsController {
       .distinct()
       .select('points.*');
 
-    return response.status(200).json(points);
+    const serializedPoints = points.map(point => {
+      return { 
+        ...point, 
+        imageUrl: `${host}/uploads/${point.image}`, 
+      }
+    });
+
+    return response.status(200).json(serializedPoints);
   }
 
   async show(request: Request, response: Response) {
@@ -29,12 +37,17 @@ class PointsController {
       return response.status(400).json({ message: 'Point not found! '});
     }
 
+    const serializedPoint = {
+        ...point, 
+        imageUrl: `${host}/uploads/${point.image}`, 
+    };
+
     const items = await knex('items')
       .join('points_items', 'points_items.item_id', '=', 'items.id')
       .where('points_items.point_id', point.id)
       .select('items.title');
 
-    return response.status(200).json({ point, items });
+    return response.status(200).json({ serializedPoint, items });
   }
 
   async create(request: Request, response: Response) {
@@ -42,12 +55,14 @@ class PointsController {
 
     const trx = await knex.transaction();
 
-    const point = { name, email, phone, lat, lon, city, uf, image: 'image-fake' };
+    const point = { name, email, phone, lat, lon, city, uf, image: request.file.filename };
 
     const insertedIds = await trx('points').insert(point);
     const point_id = insertedIds[0]
 
-    const pointItems = items.map((item_id: number) => {
+    const pointItems = items.split(',')
+      .map((item: string) => Number(item.trim()))
+      .map((item_id: number) => {
       return { item_id, point_id }
     });
 
