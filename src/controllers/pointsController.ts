@@ -10,8 +10,8 @@ class PointsController {
     const parseItems = String(items).split(',').map(item => Number(item.trim()));
 
     const points = await knex('points')
-      .join('points_items', 'points_items.points_id', '=', 'points.id')
-      .whereIn('points_items,item_id', parseItems)
+      .join('points_items', 'points_items.point_id', '=', 'points.id')
+      .whereIn('points_items.item_id', parseItems)
       .where('city', String(city))
       .where('uf', String(uf))
       .distinct()
