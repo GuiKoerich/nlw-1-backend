@@ -47,7 +47,7 @@ class PointsController {
       .where('points_items.point_id', point.id)
       .select('items.title');
 
-    return response.status(200).json({ serializedPoint, items });
+    return response.status(200).json({ point: serializedPoint, items });
   }
 
   async create(request: Request, response: Response) {
@@ -55,7 +55,7 @@ class PointsController {
 
     const trx = await knex.transaction();
 
-    const point = { name, email, phone, lat, lon, city, uf, image: request.file.filename };
+    const point = { name, email, phone: `+55${phone}`, lat, lon, city, uf, image: request.file.filename };
 
     const insertedIds = await trx('points').insert(point);
     const point_id = insertedIds[0]
